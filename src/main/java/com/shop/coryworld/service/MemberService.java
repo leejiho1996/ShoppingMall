@@ -3,7 +3,6 @@ package com.shop.coryworld.service;
 import com.shop.coryworld.entity.Member;
 import com.shop.coryworld.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
