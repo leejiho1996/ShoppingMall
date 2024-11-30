@@ -25,7 +25,6 @@ public class CartService {
     private final MemberRepository memberRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-    private final OrderRepository orderRepository;
     private final OrderService orderService;
 
     public Long addCart(CartItemDto cartItemDto, String email) {

@@ -26,7 +26,7 @@ public class CartController {
 
     @PostMapping("/cart")
     @ResponseBody
-    public ResponseEntity<?> order(@RequestBody @Valid CartItemDto cartItemDto, BindingResult bindingResult,
+    public ResponseEntity<?> cartAdd(@RequestBody @Valid CartItemDto cartItemDto, BindingResult bindingResult,
                                    Principal principal) {
 
         if (bindingResult.hasErrors()) {
@@ -50,7 +50,7 @@ public class CartController {
     }
 
     @GetMapping("/cart")
-    public String orderHist(Principal principal, Model model) {
+    public String cartHist(Principal principal, Model model) {
         List<CartDetailDto> cartDetailList = cartService.getCartList(principal.getName());
         log.info("cartDetailList: {}", cartDetailList.size());
         model.addAttribute("cartItems", cartDetailList);
