@@ -25,10 +25,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-//                .securityMatcher("/team/**", "/admin/**")
-//                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeHttpRequestsCustomizer -> authorizeHttpRequestsCustomizer
-                        .requestMatchers("/css/**", "/js/**", "/img/**").permitAll()
+                        .requestMatchers("/shopImages/**", "/css/**", "/js/**", "/img/**").permitAll()
                         .requestMatchers("/", "/members/**", "/item/**", "/images/**", "/error/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
@@ -48,24 +46,5 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return NoOpPasswordEncoder.getInstance();  // 비밀번호 암호화 비활성화
-//    }
-
-//    @Bean
-//    public InMemoryUserDetailsManager inMemoryUserDetailsManager(PasswordEncoder passwordEncoder) {
-//        UserDetails adminUser = User.builder()
-//                .username("admin@admin.com")
-//                .password(passwordEncoder.encode("123"))
-//                .roles("ADMIN")
-//                .build();
-//
-//        log.info("passwordEncoder: {}", passwordEncoder);
-//        log.info("adminUser: {}", adminUser.getPassword());
-//        return new InMemoryUserDetailsManager(adminUser);
-//    }
-    
 
 }

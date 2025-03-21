@@ -2,7 +2,7 @@ package com.shop.coryworld.entity;
 
 import com.shop.coryworld.constant.Role;
 import com.shop.coryworld.entity.base.BaseEntity;
-import com.shop.coryworld.repository.dto.MemberFormDto;
+import com.shop.coryworld.dto.MemberFormDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,7 +36,7 @@ public class Member extends BaseEntity {
         this.name = memberFormDto.getName();
         this.email = memberFormDto.getEmail();
         this.address = memberFormDto.getAddress();
-        this.role = Role.ADMIN;
+        this.role = Role.USER;
         this.password = passwordEncoder.encode(memberFormDto.getPassword());
     }
 

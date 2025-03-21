@@ -2,17 +2,20 @@ package com.shop.coryworld.service;
 
 import com.shop.coryworld.entity.Item;
 import com.shop.coryworld.entity.ItemImg;
+import com.shop.coryworld.exception.NoAuthorizationException;
 import com.shop.coryworld.repository.ItemImgRepository;
 import com.shop.coryworld.repository.ItemRepository;
-import com.shop.coryworld.repository.dto.ItemFormDto;
-import com.shop.coryworld.repository.dto.ItemImgDto;
-import com.shop.coryworld.repository.dto.ItemSearchDto;
-import com.shop.coryworld.repository.dto.MainItemDto;
+import com.shop.coryworld.dto.ItemFormDto;
+import com.shop.coryworld.dto.ItemImgDto;
+import com.shop.coryworld.dto.ItemSearchDto;
+import com.shop.coryworld.dto.MainItemDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,10 +36,11 @@ public class ItemService {
     public Long saveItem(ItemFormDto itemFormDto, List<MultipartFile> itemImgFileList) throws Exception {
 
         Item item = itemFormDto.createItem();
+        item.setLike(0);
         log.info("item : {}", item);
         itemRepository.save(item);
 
-        for (int i = 0; i< itemImgFileList.size(); i++) {
+        for (int i = 0; i < itemImgFileList.size(); i++) {
             ItemImg itemImg = new ItemImg(item);
             if (i == 0) {
                 itemImg.setRepImgYn("Y");
@@ -89,5 +93,13 @@ public class ItemService {
     @Transactional(readOnly = true)
     public Page<MainItemDto> getMainItemPage(ItemSearchDto itemSearchDto, Pageable pageable) {
         return itemRepository.getMainItemPage(itemSearchDto, pageable);
+    }
+
+    @Transactional
+    public void deleteItem(Long itemId, User user) {
+        if (!user.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+            throw new NoAuthorizationException("권한이 없습니다.");
+        }
+        itemRepository.deleteById(itemId);
     }
 }

@@ -1,6 +1,6 @@
 package com.shop.coryworld.controller;
 
-import com.shop.coryworld.repository.dto.LikeItemDto;
+import com.shop.coryworld.dto.LikeItemDto;
 import com.shop.coryworld.service.LikeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

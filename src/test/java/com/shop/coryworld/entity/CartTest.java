@@ -1,8 +1,7 @@
 package com.shop.coryworld.entity;
 
 import com.shop.coryworld.repository.CartRepository;
-import com.shop.coryworld.repository.MemberRepository;
-import com.shop.coryworld.repository.dto.MemberFormDto;
+import com.shop.coryworld.dto.MemberFormDto;
 import com.shop.coryworld.service.MemberService;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;

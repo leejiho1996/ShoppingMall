@@ -1,7 +1,7 @@
 package com.shop.coryworld.controller;
 
-import com.shop.coryworld.repository.dto.OrderDto;
-import com.shop.coryworld.repository.dto.OrderHistDto;
+import com.shop.coryworld.dto.OrderDto;
+import com.shop.coryworld.dto.OrderHistDto;
 import com.shop.coryworld.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.shop.coryworld.repository;
 
 import com.shop.coryworld.entity.CartItem;
-import com.shop.coryworld.repository.dto.CartDetailDto;
+import com.shop.coryworld.dto.CartDetailDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -10,7 +10,7 @@ import java.util.List;
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     CartItem findByCartIdAndItemId(Long cartId, Long itemId);
 
-    @Query("select new com.shop.coryworld.repository.dto.CartDetailDto" +
+    @Query("select new com.shop.coryworld.dto.CartDetailDto" +
             "(ci.id, i.itemName, i.price, ci.count, im.imgUrl) " +
             "from CartItem ci " +
             "join ci.item i " +

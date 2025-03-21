@@ -5,9 +5,9 @@ import com.shop.coryworld.repository.ItemImgRepository;
 import com.shop.coryworld.repository.ItemRepository;
 import com.shop.coryworld.repository.MemberRepository;
 import com.shop.coryworld.repository.OrderRepository;
-import com.shop.coryworld.repository.dto.OrderDto;
-import com.shop.coryworld.repository.dto.OrderHistDto;
-import com.shop.coryworld.repository.dto.OrderItemDto;
+import com.shop.coryworld.dto.OrderDto;
+import com.shop.coryworld.dto.OrderHistDto;
+import com.shop.coryworld.dto.OrderItemDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,6 @@ import org.thymeleaf.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional

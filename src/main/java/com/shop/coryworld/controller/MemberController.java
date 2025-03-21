@@ -1,10 +1,8 @@
 package com.shop.coryworld.controller;
 
 import com.shop.coryworld.entity.Member;
-import com.shop.coryworld.repository.MemberRepository;
-import com.shop.coryworld.repository.dto.MemberFormDto;
+import com.shop.coryworld.dto.MemberFormDto;
 import com.shop.coryworld.service.MemberService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;

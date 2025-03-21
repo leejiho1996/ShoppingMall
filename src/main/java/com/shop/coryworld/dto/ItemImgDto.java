@@ -1,10 +1,11 @@
-package com.shop.coryworld.repository.dto;
+package com.shop.coryworld.dto;
 
 import com.shop.coryworld.entity.ItemImg;
 import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
 
+// Item - Image 연결 DTO
 @Getter
 @Setter
 public class ItemImgDto {

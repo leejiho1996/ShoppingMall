@@ -17,7 +17,7 @@ public class FileService {
 
         UUID uuid = UUID.randomUUID();
         String extension  = originalFileName.substring(originalFileName.lastIndexOf("."));
-        String savedFileName = uuid.toString() + extension;
+        String savedFileName = uuid + extension;
         String fileUploadFullUrl = uploadPath + "/" + savedFileName;
 
         FileOutputStream fos = new FileOutputStream(fileUploadFullUrl);

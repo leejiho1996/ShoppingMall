@@ -7,7 +7,7 @@ import com.shop.coryworld.entity.Member;
 import com.shop.coryworld.repository.CartItemRepository;
 import com.shop.coryworld.repository.ItemRepository;
 import com.shop.coryworld.repository.MemberRepository;
-import com.shop.coryworld.repository.dto.CartItemDto;
+import com.shop.coryworld.dto.CartItemDto;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

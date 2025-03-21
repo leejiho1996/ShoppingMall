@@ -9,6 +9,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,8 +29,8 @@ public class Item extends BaseEntity {
     @Column(name="price", nullable = false)
     private int price;
 
-    @Column(name="like", nullable = false)
-    private int like;
+    @Column(name="likes", nullable = false)
+    private int like = 0;
 
     @Lob
     @Column(nullable = false)
@@ -40,6 +42,10 @@ public class Item extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ItemSellStatus itemSellStatus;
 
+    @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ItemImg> itemImgList = new ArrayList<>();
+
+    // 상품 수정
     public void update(String name, int price, int stockNumber, String itemDetail, ItemSellStatus itemSellStatus) {
         this.itemName = name;
         this.price = price;
@@ -48,6 +54,7 @@ public class Item extends BaseEntity {
         this.itemSellStatus = itemSellStatus;
     }
 
+    // 상품 갯수 조정
     public void removeStock(int stockNumber) {
         int restStock = this.stockNumber - stockNumber;
 

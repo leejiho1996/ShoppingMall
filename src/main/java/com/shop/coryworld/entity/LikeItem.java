@@ -6,19 +6,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "like_item")
+@Table(name = "likes_item")
 @Getter
 @NoArgsConstructor(access= AccessLevel.PROTECTED)
 public class LikeItem {
     @Id @GeneratedValue
-    @Column(name="like_item")
+    @Column(name="likes_item")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="like_id")
+    @JoinColumn(name="likes_id")
     Like like;
 
-    @ManyToOne
+    @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="item_id")
     Item item;
 

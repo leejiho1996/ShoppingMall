@@ -1,8 +1,8 @@
 package com.shop.coryworld.repository;
 
 import com.shop.coryworld.entity.Item;
-import com.shop.coryworld.repository.dto.ItemSearchDto;
-import com.shop.coryworld.repository.dto.MainItemDto;
+import com.shop.coryworld.dto.ItemSearchDto;
+import com.shop.coryworld.dto.MainItemDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

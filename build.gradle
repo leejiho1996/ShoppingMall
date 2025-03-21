@@ -61,6 +61,9 @@ dependencies {
 	//modelmapper
 	implementation 'org.modelmapper:modelmapper:3.2.0'
 
+	//spring WebFlux (web과 둘다 있을 경우 tomcat이 동작)
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 }
 tasks.named('test') {
 	useJUnitPlatform()

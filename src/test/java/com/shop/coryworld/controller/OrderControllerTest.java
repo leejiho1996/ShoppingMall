@@ -8,7 +8,7 @@ import com.shop.coryworld.entity.OrderItem;
 import com.shop.coryworld.repository.ItemRepository;
 import com.shop.coryworld.repository.MemberRepository;
 import com.shop.coryworld.repository.OrderRepository;
-import com.shop.coryworld.repository.dto.OrderDto;
+import com.shop.coryworld.dto.OrderDto;
 import com.shop.coryworld.service.OrderService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,8 +21,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional

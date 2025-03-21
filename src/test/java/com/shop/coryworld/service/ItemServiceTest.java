@@ -5,7 +5,7 @@ import com.shop.coryworld.entity.Item;
 import com.shop.coryworld.entity.ItemImg;
 import com.shop.coryworld.repository.ItemImgRepository;
 import com.shop.coryworld.repository.ItemRepository;
-import com.shop.coryworld.repository.dto.ItemFormDto;
+import com.shop.coryworld.dto.ItemFormDto;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

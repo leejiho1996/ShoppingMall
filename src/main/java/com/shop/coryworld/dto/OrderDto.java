@@ -1,4 +1,4 @@
-package com.shop.coryworld.repository.dto;
+package com.shop.coryworld.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

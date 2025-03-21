@@ -1,4 +1,4 @@
-package com.shop.coryworld.repository.dto;
+package com.shop.coryworld.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;

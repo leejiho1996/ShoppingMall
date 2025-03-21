@@ -1,4 +1,4 @@
-package com.shop.coryworld.repository.dto;
+package com.shop.coryworld.dto;
 
 import com.shop.coryworld.constant.ItemSellStatus;
 import com.shop.coryworld.entity.Item;

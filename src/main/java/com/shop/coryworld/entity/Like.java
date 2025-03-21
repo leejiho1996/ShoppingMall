@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "like")
+@Table(name = "likes")
 @Getter
 @NoArgsConstructor
 public class Like extends BaseEntity {
