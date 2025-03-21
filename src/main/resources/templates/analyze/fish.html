@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>물고기 AI 분석</title>
+</head>
+
+<!-- 🎨 사용자 CSS -->
+<th:block layout:fragment="css">
+    <style>
+        .ai-wrapper {
+            max-width: 720px;
+            margin: 60px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .ai-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #0077b6;
+            margin-bottom: 30px;
+        }
+
+        .preview-img {
+            width: 100%;
+            max-height: 360px;
+            object-fit: contain;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            margin-top: 25px;
+        }
+
+        .result-card {
+            margin-top: 40px;
+            background: #f1faff;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #d0ecff;
+        }
+
+        .result-card h4 {
+            font-weight: bold;
+            color: #023e8a;
+            margin-bottom: 15px;
+        }
+
+        .btn-analyze {
+            background-color: #00b4d8;
+            color: white;
+            padding: 10px 25px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .btn-analyze:hover {
+            background-color: #0096c7;
+        }
+
+        .btn-shop {
+            margin-top: 15px;
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #0077b6;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn-shop:hover {
+            background-color: #023e8a;
+        }
+    </style>
+</th:block>
+
+<!-- 📄 본문 -->
+<div layout:fragment="content" class="content">
+    <div class="ai-wrapper">
+        <div class="ai-title">🐟 물고기 이미지 AI 분석</div>
+
+        <div class="form-group">
+            <input type="file" id="imageInput" accept="image/*" class="form-control-file" />
+        </div>
+
+        <button onclick="analyzeImage()" class="btn-analyze mt-3">🔍 분석 요청</button>
+
+        <div id="preview"></div>
+        <div id="result"></div>
+    </div>
+</div>
+
+<!-- ⚙️ JS -->
+<th:block layout:fragment="script">
+    <script>
+        async function analyzeImage() {
+            const input = document.getElementById('imageInput');
+            const file = input.files[0];
+
+            if (!file) {
+                alert('이미지를 선택하세요!');
+                return;
+            }
+
+            const preview = document.getElementById('preview');
+            preview.innerHTML = `<img src="${URL.createObjectURL(file)}" class="preview-img" alt="미리보기" />`;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div class="mt-4 text-center">
+                    <div class="spinner-border text-info" role="status"></div>
+                    <p class="mt-2">AI가 이미지를 분석 중입니다...</p>
+                </div>
+            `;
+
+            const formData = new FormData();
+            formData.append('imageFile', file);
+
+            try {
+                const res = await fetch('/api/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                resultDiv.innerHTML = `
+                    <div class="result-card">
+                        <h4>🎯 AI 분석 결과</h4>
+                        <p><strong>분석된 물고기:</strong> ${data.fishName}</p>
+                        ${ data.productUrl
+                        ? `<a class="btn-shop" href="${data.productUrl}">🛒 ${data.fishName} 관련 상품 보기</a>`
+                        : `<p class="text-muted mt-2">😢 관련 상품이 없습니다.</p>`
+                }
+                    </div>
+                `;
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="alert alert-danger mt-3">에러 발생: ${err}</div>`;
+            }
+        }
+    </script>
+</th:block>
+
+</html>
