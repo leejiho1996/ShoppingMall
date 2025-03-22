@@ -6,6 +6,7 @@ import com.shop.coryworld.repository.ItemRepository;
 import com.shop.coryworld.entity.Item;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
@@ -18,15 +19,17 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AnalyzeService {
 
-    private ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
 
     private Map<String, Long> fishMap;
 
@@ -73,13 +76,17 @@ public class AnalyzeService {
                     }
                 }).block();
 
+        // 분석결과가 없을 때 빈 리스트 리턴
         if (result.getResults().isEmpty()) {
-            return null;
+            return new ArrayList<>();
         }
 
+        // 분석된 아이템들의 이름을 itemId로 매핑
         List<Long> itemIdList = result.getResults().stream()
                 .map(r -> fishMap.get(r.getClassName()))
                 .toList();
+
+        log.info("itemIdList {}", itemIdList);
 
         return itemRepository.findAnalyzedItemByItemList(itemIdList);
     }

@@ -6,6 +6,8 @@
 <head>
     <meta charset="UTF-8">
     <title>물고기 AI 분석</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 
 <!-- 🎨 사용자 CSS -->
@@ -66,9 +68,9 @@
         }
 
         .btn-shop {
-            margin-top: 15px;
+            margin-top: 10px;
             display: inline-block;
-            padding: 10px 20px;
+            padding: 8px 16px;
             background-color: #0077b6;
             color: white;
             border-radius: 8px;
@@ -122,29 +124,58 @@
                 </div>
             `;
 
+            // CSRF 토큰 꺼내기
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
             const formData = new FormData();
-            formData.append('imageFile', file);
+            formData.append('multipartFile', file); // 백엔드 파라미터명에 맞게 수정
 
             try {
                 const res = await fetch('/api/analyze', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    }
                 });
 
-                const data = await res.json();
+                if (!res.ok) throw new Error('서버 오류');
 
-                resultDiv.innerHTML = `
+                const data = await res.json();
+                console.log(data);
+
+                if (data.length === 0) {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-warning mt-4 text-center">😢 분석된 물고기가 없습니다.</div>
+                    `;
+                    return;
+                }
+
+                let html = `
                     <div class="result-card">
                         <h4>🎯 AI 분석 결과</h4>
-                        <p><strong>분석된 물고기:</strong> ${data.fishName}</p>
-                        ${ data.productUrl
-                        ? `<a class="btn-shop" href="${data.productUrl}">🛒 ${data.fishName} 관련 상품 보기</a>`
-                        : `<p class="text-muted mt-2">😢 관련 상품이 없습니다.</p>`
-                }
-                    </div>
                 `;
+
+                data.forEach(item => {
+                    html += `
+                            <p><strong>물고기 이름:</strong> ${item.title}</p>
+                       ${ item.repImg
+                        ? ` <div class="repImgDiv">
+                                <img src="${item.repImg}" class="rounded repImg" alt="${item.title}">
+                            </div>
+                            <a class="btn-shop" href="/item/${item.itemId}" target="_blank">🛒 관련 상품 보기</a>`
+                        : `<p class="text-muted mt-2">😢 관련 상품 이미지가 없습니다.</p>`
+                    }
+                        <hr/>
+                             `;
+                });
+
+                html += `</div>`;
+                resultDiv.innerHTML = html;
+
             } catch (err) {
-                resultDiv.innerHTML = `<div class="alert alert-danger mt-3">에러 발생: ${err}</div>`;
+                resultDiv.innerHTML = `<div class="alert alert-danger mt-3">에러 발생: ${err.message}</div>`;
             }
         }
     </script>
