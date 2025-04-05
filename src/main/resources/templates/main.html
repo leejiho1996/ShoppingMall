@@ -4,20 +4,79 @@
       layout:decorate="~{layouts/layout1}">
 
 <th:block layout:fragment="script">
+
     <script th:inline="javascript">
-        $(document).ready(function(){
+
+        $(document).ready(function() {
             var errorMessage = [[${errorMessage}]];
-            if(errorMessage != null){
+            if(errorMessage != null) {
                 alert(errorMessage);
             }
-
-            bindDomEvent();
-
         });
+
+        $(document).on('click', '.wishlist', function () {
+            const itemId = $(this).data('item-id');
+            console.log(itemId);
+            const URL = "/like/" + itemId;
+
+            let isLogin = [[${#authentication.principal != 'anonymousUser'}]];
+
+            if (!isLogin) {
+                alert("로그인이 필요합니다.");
+                window.location.href = "/members/login";
+                return;
+            }
+
+            let heart = $(this).find('i');
+            let likeCountSpan = $(this).find('span');
+            let currentCount = Number(likeCountSpan.text()) || 0;
+            let sendType;
+
+            if (heart.hasClass('far')) {
+                sendType = "POST"
+            } else {
+                sendType = "DELETE";
+            }
+
+            // 누르면 채워진 하트로 토글
+            heart.toggleClass('far').toggleClass('fas')
+
+            if (sendType === "POST") {
+                likeCountSpan.text(currentCount+1);
+            } else {
+                likeCountSpan.text(currentCount-1);
+            }
+
+            const token = /*[[${_csrf.token}]]*/ "";
+            const header = /*[[${_csrf.headerName}]]*/ "";
+
+            // 찜 Ajax 로직 실행
+            $.ajax({
+                url : URL,
+                type: sendType,
+                data: itemId,
+                beforeSend : function(xhr){
+                    // 데이터를 전송하기 전에 헤더에 csrf값을 설정
+                    xhr.setRequestHeader(header, token);
+                },
+                dataType:"json",
+                cache: false,
+
+                success : function() {
+                    console.log("찜하기 성공");
+                },
+                error : function() {
+                    console.log("찜하기 실패");
+                }
+            })
+        });
+
     </script>
 </th:block>
 <!-- 사용자 CSS 추가 -->
 <th:block layout:fragment="css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
     <style>
         .margin{
             margin-bottom:30px;
@@ -73,12 +132,26 @@
                 <div class="card">
                     <a th:href="'/item/' +${item.id}" class="text-dark">
                         <img th:src="${item.imgUrl}" class="card-img-top" th:alt="${item.itemNm}" height="400">
-                        <div class="card-body">
-                            <h4 class="card-title">[[${item.itemNm}]]</h4>
-                            <p class="card-text">[[${item.itemDetail}]]</p>
-                            <h3 class="card-title text-danger">[[${#numbers.formatDecimal(item.price, 1, 'COMMA', 0, 'POINT')}]]원</h3>
-                        </div>
                     </a>
+                        <div class="card-body">
+                            <a th:href="'/item/' +${item.id}" class="text-dark">
+                            <h4 class="card-title">[[${item.itemNm}]]</h4>
+                            </a>
+                            <a th:href="'/item/' +${item.id}" class="text-dark">
+                            <p class="card-text">[[${item.itemDetail}]]</p>
+                            </a>
+                            <!-- 💸 가격 + 하트 아이콘 함께 정렬 -->
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <h3 class="card-title text-danger mb-0">
+                                    [[${#numbers.formatDecimal(item.price, 1, 'COMMA', 0, 'POINT')}]]원
+                                </h3>
+                                <div class="wishlist d-flex align-items-center" th:data-item-id="${item.id}" style="cursor: pointer;">
+                                    <i th:class="${item.isLiked} ? 'fas fa-heart text-danger' : 'far fa-heart text-danger'"
+                                       style="font-size: 1.5rem;"></i>
+                                    <span class="ml-1 text-muted"><span class="ml-1 text-muted">[[${#numbers.formatDecimal(item.likeCnt, 1, 'COMMA', 0, 'POINT')}]]</span></span>
+                                </div>
+                            </div>
+                        </div>
                 </div>
             </div>
         </th:block>
@@ -87,7 +160,7 @@
     <div th:with="start=${(items.number/maxPage)*maxPage + 1}, end=(${(items.totalPages == 0) ? 1 : (start + (maxPage - 1) < items.totalPages ? start + (maxPage - 1) : items.totalPages)})" >
         <ul class="pagination justify-content-center">
 
-            <li class="page-item" th:classappend="${items.number eq 0}?'disabled':''">
+            <li class="page-item" th:classappend="${items.number eq 0} ? 'disabled' : ''">
                 <a th:href="@{'/' + '?searchQuery=' + ${itemSearchDto.searchQuery} + '&page=' + ${items.number-1}}" aria-label='Previous' class="page-link">
                     <span aria-hidden='true'>Previous</span>
                 </a>

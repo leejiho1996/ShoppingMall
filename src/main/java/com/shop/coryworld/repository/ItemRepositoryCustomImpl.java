@@ -20,6 +20,7 @@ import java.util.List;
 
 import static com.shop.coryworld.entity.QItem.item;
 import static com.shop.coryworld.entity.QItemImg.*;
+import static com.shop.coryworld.entity.QLike.like;
 
 public class ItemRepositoryCustomImpl implements ItemRepositoryCustom {
 
@@ -51,18 +52,24 @@ public class ItemRepositoryCustomImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public Page<MainItemDto> getMainItemPage(ItemSearchDto itemSearchDto, Pageable pageable) {
+    public Page<MainItemDto> getMainItemPage(ItemSearchDto itemSearchDto, Pageable pageable, Long memberId) {
         QueryResults<MainItemDto> results = queryFactory.select(
                         new QMainItemDto(
                                 item.id,
                                 item.itemName,
                                 item.itemDetail,
                                 itemImg.imgUrl,
-                                item.price
+                                item.price,
+                                item.like,
+                                like.id.isNotNull()
                         )
                 )
                 .from(itemImg)
                 .join(itemImg.item, item)
+                .leftJoin(like).on(
+                        like.item.eq(item),
+                        like.member.id.eq(memberId) // 현재 로그인한 유저와의 Like 여부
+                )
                 .where(itemImg.repImgYn.eq("Y"), itemNameLike(itemSearchDto.getSearchQuery()))
                 .orderBy(item.id.desc())
                 .offset(pageable.getOffset())

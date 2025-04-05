@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 public class AnalyzeService {
 
     private final ItemRepository itemRepository;
+    private final FileService fileService;
 
     private Map<String, Long> fishMap;
 
@@ -45,8 +46,23 @@ public class AnalyzeService {
 
 
     public List<AnalyzeItemDto> doAnalyze(MultipartFile multipartFile) throws IOException {
+        // 파일 확인
+        if (multipartFile.isEmpty()) {
+            throw new RuntimeException();
+        }
 
-        byte[] imageByte = multipartFile.getBytes();
+        if (!fileService.checkImgFile(multipartFile)) {
+            throw new RuntimeException("지원하지 않는 파일이거나, 잘못된 파일입니다.");
+        }
+
+        byte[] imageByte;
+
+        try {
+            imageByte = multipartFile.getBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("잘못된 파일입니다.");
+        }
+
         ByteArrayResource byteArrayResource = new ByteArrayResource(imageByte) {
             @Override
             public String getFilename() {

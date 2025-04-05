@@ -42,8 +42,8 @@ dependencies {
 	testAnnotationProcessor 'org.projectlombok:lombok'
 
 	// Querydsl
-	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+	implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
+	annotationProcessor "com.querydsl:querydsl-apt:5.1.0:jakarta"
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
@@ -63,6 +63,9 @@ dependencies {
 
 	//spring WebFlux (web과 둘다 있을 경우 tomcat이 동작)
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	//Tika
+	implementation 'org.apache.tika:tika-core:3.1.0'
 
 }
 tasks.named('test') {

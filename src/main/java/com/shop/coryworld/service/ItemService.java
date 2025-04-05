@@ -1,7 +1,9 @@
 package com.shop.coryworld.service;
 
+import com.shop.coryworld.auth.PrincipalDetails;
 import com.shop.coryworld.entity.Item;
 import com.shop.coryworld.entity.ItemImg;
+import com.shop.coryworld.exception.InvalidImageException;
 import com.shop.coryworld.exception.NoAuthorizationException;
 import com.shop.coryworld.repository.ItemImgRepository;
 import com.shop.coryworld.repository.ItemRepository;
@@ -9,6 +11,7 @@ import com.shop.coryworld.dto.ItemFormDto;
 import com.shop.coryworld.dto.ItemImgDto;
 import com.shop.coryworld.dto.ItemSearchDto;
 import com.shop.coryworld.dto.MainItemDto;
+import com.shop.coryworld.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,9 +33,11 @@ import java.util.List;
 @Slf4j
 public class ItemService {
 
+    private final MemberRepository memberRepository;
     private final ItemRepository itemRepository;
     private final ItemImgService itemImgService;
     private final ItemImgRepository itemImgRepository;
+    private final FileService fileService;
 
     public Long saveItem(ItemFormDto itemFormDto, List<MultipartFile> itemImgFileList) throws Exception {
 
@@ -55,6 +61,10 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public ItemFormDto getItemDtl(Long itemId) {
+
+        Item item = itemRepository.findById(itemId).orElseThrow(EntityNotFoundException::new);
+        ItemFormDto itemFormDto = ItemFormDto.of(item);
+
         List<ItemImg> itemImgList = itemImgRepository.findByItemIdOrderByIdAsc(itemId);
         List<ItemImgDto> itemImgDtoList = new ArrayList<>();
 
@@ -62,18 +72,25 @@ public class ItemService {
             ItemImgDto itemImgDto = ItemImgDto.of(itemImg);
             itemImgDtoList.add(itemImgDto);
         }
-
-        Item item = itemRepository.findById(itemId).orElseThrow(EntityNotFoundException::new);
-        ItemFormDto itemFormDto = ItemFormDto.of(item);
+        // 찾아온 itemImg set
         itemFormDto.setItemImgDtoList(itemImgDtoList);
+
         return itemFormDto;
     }
 
     public Long updateItem (ItemFormDto itemFormDto, List<MultipartFile> itemImgFileList) throws Exception {
 
+        if (itemImgFileList == null || itemImgFileList.isEmpty() || itemImgFileList.get(0).isEmpty()) {
+            throw new InvalidImageException("첫 번째 상품 이미지는 필수입니다.");
+        }
+
+        if (!fileService.checkImgFile(itemImgFileList.get(0))) {
+            throw new InvalidImageException("지원하지 않는 이미지 형식입니다.");
+        }
+
         // 상품 수정
         Item item = itemRepository.findById(itemFormDto.getId()).orElseThrow(EntityNotFoundException::new);
-        itemFormDto.updateItem(item);
+        item.update(itemFormDto);
 
         List<Long> itemImgIds = itemFormDto.getItemImgIds();
 
@@ -91,8 +108,14 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public Page<MainItemDto> getMainItemPage(ItemSearchDto itemSearchDto, Pageable pageable) {
-        return itemRepository.getMainItemPage(itemSearchDto, pageable);
+    public Page<MainItemDto> getMainItemPage(ItemSearchDto itemSearchDto, Pageable pageable, PrincipalDetails user) {
+        Long memberId = -1L;
+
+        if (user != null) {
+            memberId = user.getId();
+        }
+
+        return itemRepository.getMainItemPage(itemSearchDto, pageable, memberId);
     }
 
     @Transactional

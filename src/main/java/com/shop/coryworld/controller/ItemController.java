@@ -64,8 +64,8 @@ public class ItemController {
 
     // 아이템 상세정보
     @GetMapping("/admin/item/{itemId}")
-    public String itemDtl(@PathVariable("itemId") Long itemId, Model model,
-                          @AuthenticationPrincipal User user) {
+    public String itemDtl(@PathVariable("itemId") Long itemId, Model model) {
+
         try {
             ItemFormDto itemFormDto = itemService.getItemDtl(itemId);
             model.addAttribute("itemFormDto", itemFormDto);
@@ -112,7 +112,7 @@ public class ItemController {
     // 아이템 관리창
     @GetMapping( value = {"/admin/items", "/admin/items/{page}"})
     public String itemManage(@ModelAttribute ItemSearchDto itemSearchDto, @PathVariable("page") Optional<Integer> page,
-                             Model model, @AuthenticationPrincipal User user) {
+                             Model model) {
         if (itemSearchDto == null) {
             itemSearchDto = new ItemSearchDto();
         }
@@ -131,15 +131,6 @@ public class ItemController {
         ItemFormDto itemFormDto = itemService.getItemDtl(itemId);
         model.addAttribute("item", itemFormDto);
         return "item/itemDtl";
-    }
-
-
-    private boolean isAdmin(User user) {
-        if (user.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
-            return false;
-        } else {
-            return true;
-        }
     }
 
 }

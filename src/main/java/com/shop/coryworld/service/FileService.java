@@ -1,17 +1,24 @@
 package com.shop.coryworld.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 @Slf4j
 public class FileService {
+    // apache Tika
+    private final Tika tika = new Tika();
+
+    private final List<String> imageExtensions = Arrays.asList("jpg", "jpeg", "png", "gif", "bmp");;
+
     public String uploadFile(String uploadPath, String originalFileName,
                              byte[] fileData) throws Exception {
 
@@ -35,5 +42,25 @@ public class FileService {
         } else {
             log.info("파일이 존재하지 않습니다.");
         }
+    }
+
+    public boolean checkImgFile(MultipartFile file) {
+        String fileName = file.getOriginalFilename();
+        // 파일이름 체크
+        if (fileName == null || !fileName.contains(".")) {
+            return false;
+        }
+
+        String extension  = fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase();
+
+        String detect;
+        try (InputStream fileInputStream = file.getInputStream()) {
+            detect = tika.detect(fileInputStream);
+        } catch (IOException e) {
+            return false;
+        }
+
+        return imageExtensions.contains(extension)
+                && detect.startsWith("image/");
     }
 }

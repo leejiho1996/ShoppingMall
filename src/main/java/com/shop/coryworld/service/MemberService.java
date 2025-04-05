@@ -1,14 +1,18 @@
 package com.shop.coryworld.service;
 
+import com.shop.coryworld.auth.PrincipalDetails;
 import com.shop.coryworld.entity.Member;
 import com.shop.coryworld.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +37,6 @@ public class MemberService implements UserDetailsService {
         }
     }
 
-
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Member member = memberRepository.findByEmail(email);
@@ -42,11 +45,19 @@ public class MemberService implements UserDetailsService {
             throw new UsernameNotFoundException(email);
         }
 
-        return User.builder()
+        return PrincipalDetails.builder()
+                .id(member.getId())
                 .username(member.getEmail())
                 .password(member.getPassword())
-                .roles(member.getRole().toString())
+                .authorities(List.of(new SimpleGrantedAuthority(member.getRole().toString())))
                 .build();
+
+//
+//        return User.builder()
+//                .username(member.getEmail())
+//                .password(member.getPassword())
+//                .roles(member.getRole().toString())
+//                .build();
 
     }
 }

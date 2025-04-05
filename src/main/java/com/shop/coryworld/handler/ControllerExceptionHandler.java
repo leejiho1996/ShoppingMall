@@ -11,4 +11,5 @@ public class ControllerExceptionHandler {
     public String authorizationException(NoAuthorizationException e) {
         return Script.back(e.getMessage());
     }
+
 }

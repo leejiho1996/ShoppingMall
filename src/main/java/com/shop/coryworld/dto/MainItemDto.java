@@ -18,12 +18,19 @@ public class MainItemDto {
 
     private Integer price;
 
+    private Integer likeCnt;
+
+    private Boolean isLiked;
+
     @QueryProjection
-    public MainItemDto(Long id, String itemNm, String itemDetail, String imgUrl, Integer price) {
+    public MainItemDto(Long id, String itemNm, String itemDetail, String imgUrl,
+                       Integer price, Integer likeCnt, Boolean isLiked) {
         this.id = id;
         this.itemNm = itemNm;
         this.itemDetail = itemDetail;
         this.imgUrl = imgUrl;
         this.price = price;
+        this.likeCnt = likeCnt;
+        this.isLiked = isLiked != null && isLiked; // null 방지;
     }
 }

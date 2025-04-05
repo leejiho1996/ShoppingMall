@@ -40,4 +40,12 @@ public class Member extends BaseEntity {
         this.password = passwordEncoder.encode(memberFormDto.getPassword());
     }
 
+    private Member(Long memberId) {
+        this.id = memberId;
+    }
+
+    static public Member getDummyMember(Long id) {
+        return new Member(id);
+    }
+
 }

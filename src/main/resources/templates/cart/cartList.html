@@ -50,7 +50,6 @@
             getOrderTotalPrice();
         }
 
-
         function updateCartItemCount(cartItemId, count) {
             var token = $("meta[name='_csrf']").attr("content")
             var header = $("meta[name='_csrf_header']").attr("content")
@@ -130,6 +129,11 @@
                 dataList.push(data);
             });
 
+            if (dataList.length === 0) {
+                alert("주문할 상품이 없습니다. 상품을 선택해 주세요.");
+                return
+            }
+
             paramData['cartOrderDtoList'] = dataList;
 
             var param = JSON.stringify(paramData);
@@ -157,7 +161,6 @@
                     } else{
                         alert(jqXHR.responseJSON.message);
                     }
-
                 }
             });
         }

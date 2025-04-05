@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -24,13 +25,24 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        XorCsrfTokenRequestAttributeHandler requestHandler = new XorCsrfTokenRequestAttributeHandler();
+
+        /**
+         * By setting the csrfRequestAttributeName to null,
+         * the CsrfToken must first be loaded to determine what attribute name to use.
+         * This causes the CsrfToken to be loaded on every request.
+         */
+        requestHandler.setCsrfRequestAttributeName(null);
+
         return http
-//                .csrf(csrf -> csrf.disable())
+//                .exceptionHandling(ex -> ex.accessDeniedHandler())
+                .csrf(csrf -> csrf
+                        .csrfTokenRequestHandler(requestHandler))
                 .authorizeHttpRequests(authorizeHttpRequestsCustomizer -> authorizeHttpRequestsCustomizer
                         .requestMatchers("/shopImages/**", "/css/**", "/js/**", "/img/**").permitAll()
                         .requestMatchers("/", "/members/**", "/item/**", "/images/**", "/error/**").permitAll()
-                        .requestMatchers("/api/analyze", "/api/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/analyze", "/api/**").authenticated()
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 ).formLogin(formLoginCustomizer -> formLoginCustomizer
                         .loginPage("/members/login")

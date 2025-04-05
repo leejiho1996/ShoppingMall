@@ -45,8 +45,4 @@ public class ItemFormDto {
         return modelMapper.map(item, ItemFormDto.class);
     }
 
-    public void updateItem(Item item) {
-        item.update(this.itemName, this.price, this.stockNumber, this.itemDetail, this.itemSellStatus);
-    }
-
 }
