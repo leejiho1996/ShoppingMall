@@ -8,6 +8,7 @@ import com.shop.coryworld.repository.OrderRepository;
 import com.shop.coryworld.dto.OrderDto;
 import com.shop.coryworld.dto.OrderHistDto;
 import com.shop.coryworld.dto.OrderItemDto;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
@@ -41,8 +42,9 @@ public class OrderService {
     @Value("${order.event.mode}")
     private boolean orderEventMode;
 
-    private static final int STOCK_THRESHOLD = 10;
+    private static final int STOCK_THRESHOLD = 30;
 
+    private final EntityManager em;
     private final ItemRepository itemRepository;
     private final MemberRepository memberRepository;
     private final OrderRepository orderRepository;
@@ -76,7 +78,8 @@ public class OrderService {
     // 카트에 담긴 아이템 구매 메서드
     @Transactional
     @Retryable(
-            retryFor = {OptimisticLockException.class,
+            retryFor = {
+                    OptimisticLockException.class,
                     ObjectOptimisticLockingFailureException.class,
                     StaleObjectStateException.class
             },
@@ -104,6 +107,7 @@ public class OrderService {
         } else { // 재고가 적은 아이템 선별
             pessimisticOrderItemIds = items.stream()
                     .filter(i -> i.getStockNumber() <= STOCK_THRESHOLD)
+                    .peek(i -> em.detach(i)) // 준영속 시켜줘야 낙관적락 예외 방지 가능
                     .map(Item::getId)
                     .toList();
         }
@@ -112,7 +116,7 @@ public class OrderService {
         // 재고가 적은 아이템을 비관적 락으로 다시 search
         List<Item> pessimisticOrderItem = pessimisticOrderItemIds.isEmpty()
                 ? List.of()
-                : itemRepository.findItemByIdListForUpdate(pessimisticOrderItemIds);
+                : findItemPessimistic(pessimisticOrderItemIds);
 
         // Map에 모든 아이템을 모은다
         Map<Long, Item> finalItemMap = items.stream()
@@ -200,11 +204,17 @@ public class OrderService {
         order.cancelOrder();
     }
 
-    private Item findItem(Long itemId) {
+    @Transactional
+    public Item findItem(Long itemId) {
         return (orderEventMode
                 ? itemRepository.findByIdForUpdate(itemId)
                 : itemRepository.findById(itemId))
                 .orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Transactional
+    public List<Item> findItemPessimistic(List<Long> itemIds) {
+        return itemRepository.findItemByIdListForUpdate(itemIds);
     }
 
     // @Transactional
