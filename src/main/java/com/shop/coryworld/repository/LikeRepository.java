@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface LikeRepository extends JpaRepository<Like, Long> {
@@ -21,4 +22,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
 
     @Query("select l from Like l join fetch l.item where l.id = :likeId")
     Optional<Like> findLikeWithItem(@Param("likeId") Long likeId);
+
+    @Query("select l.item from Like l join l.item where l.member.id = :memberId")
+    List<Item> getLikeItem(@Param("memberId") Long memberId);
 }

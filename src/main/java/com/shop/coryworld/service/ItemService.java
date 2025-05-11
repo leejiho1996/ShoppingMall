@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
 public class ItemService {
@@ -39,6 +39,7 @@ public class ItemService {
     private final ItemImgRepository itemImgRepository;
     private final FileService fileService;
 
+    @Transactional
     public Long saveItem(ItemFormDto itemFormDto, List<MultipartFile> itemImgFileList) throws Exception {
 
         Item item = itemFormDto.createItem();
@@ -78,6 +79,7 @@ public class ItemService {
         return itemFormDto;
     }
 
+    @Transactional
     public Long updateItem (ItemFormDto itemFormDto, List<MultipartFile> itemImgFileList) throws Exception {
 
         if (itemImgFileList == null || itemImgFileList.isEmpty() || itemImgFileList.get(0).isEmpty()) {

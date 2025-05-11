@@ -23,6 +23,9 @@ public class Item extends BaseEntity {
     @Column(name = "item_id")
     private Long id;
 
+    @Version
+    private long version = 0L;
+
     @Column(nullable = false, length = 50)
     private String itemName;
 
@@ -84,4 +87,16 @@ public class Item extends BaseEntity {
         this.like--;
     }
 
+    public static Item getTestItem() {
+        Item item = new Item();
+        item.stockNumber = 20;
+        item.setPrice(2000);
+        item.setItemName("test");
+        item.setItemDetail("test");
+        item.setItemSellStatus(ItemSellStatus.SELL);
+        return item;
+    }
+
+    public Item() {
+    }
 }

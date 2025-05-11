@@ -2,7 +2,9 @@ package com.shop.coryworld.repository;
 
 import com.shop.coryworld.dto.analyze.AnalyzeItemDto;
 import com.shop.coryworld.entity.Item;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
@@ -27,5 +29,16 @@ public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositor
             "from ItemImg im join im.item i " +
             "where im.repImgYn = 'Y' and i.id in :itemList")
     List<AnalyzeItemDto> findAnalyzedItemByItemList(@Param("itemList") List<Long> itemList);
+
+    @Query("select i from Item i where i.id in :itemIdList")
+    List<Item> findItemByIdList(@Param("itemIdList") List<Long> itemIdList);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select i from Item i where i.id = :itemId")
+    Optional<Item> findByIdForUpdate(@Param("itemId") Long itemId);
+
+    @Lock(LockModeType.PESSIMISTIC_FORCE_INCREMENT)
+    @Query("select i from Item i where i.id in :itemIdList")
+    List<Item> findItemByIdListForUpdate(@Param("itemIdList") List<Long> itemIdList);
 
 }

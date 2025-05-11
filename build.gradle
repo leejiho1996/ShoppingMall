@@ -67,6 +67,9 @@ dependencies {
 	//Tika
 	implementation 'org.apache.tika:tika-core:3.1.0'
 
+	// spring retry
+	implementation 'org.springframework.retry:spring-retry'
+
 }
 tasks.named('test') {
 	useJUnitPlatform()

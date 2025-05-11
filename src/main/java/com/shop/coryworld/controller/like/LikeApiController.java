@@ -1,23 +1,16 @@
-package com.shop.coryworld.controller;
+package com.shop.coryworld.controller.like;
 
 import com.shop.coryworld.auth.PrincipalDetails;
-import com.shop.coryworld.dto.LikeItemDto;
 import com.shop.coryworld.service.LikeService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
-public class LikeController {
+public class LikeApiController {
     private final LikeService likeService;
 
     @PostMapping("/like/{itemId}")

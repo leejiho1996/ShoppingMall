@@ -1,7 +1,6 @@
 package com.shop.coryworld.auth;
 
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,9 +8,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Data
+@Getter
 @Builder
-public class PrincipalDetails implements UserDetails {
+public final class PrincipalDetails implements UserDetails {
 
     @Getter
     private final Long id;
@@ -39,6 +38,10 @@ public class PrincipalDetails implements UserDetails {
     @Override
     public String getUsername() {
         return username;
+    }
+
+    public String getName() {
+        return this.getUsername();
     }
 
 }

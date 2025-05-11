@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 @Slf4j
 public class CartService {
 
@@ -27,6 +28,7 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final OrderService orderService;
 
+    @Transactional
     public Long addCart(CartItemDto cartItemDto, String email) {
         Item item = itemRepository.findById(cartItemDto.getItemId())
                 .orElseThrow(EntityNotFoundException::new);
@@ -44,7 +46,6 @@ public class CartService {
         if (savedCartItem != null) {
             savedCartItem.addCount(cartItemDto.getCount());
             return savedCartItem.getId();
-
         } else {
             CartItem cartItem = CartItem.createCartItem(item, cartItemDto.getCount(), cart);
             cartItemRepository.save(cartItem);
@@ -52,7 +53,22 @@ public class CartService {
         }
     }
 
-    @Transactional(readOnly = true)
+    /**
+     * PrincipalDetails를 활용하여 Member 찾는 과정을 생략한 메서드
+     */
+    public List<CartDetailDto> getCartListByUserId(Long userId) {
+        List<CartDetailDto> cartDetailDtoList = new ArrayList<>();
+        Cart cart = cartRepository.findByMemberId(userId);
+
+        if (cart == null) {
+            return cartDetailDtoList;
+        }
+
+        cartDetailDtoList = cartItemRepository.findCartDetailDtoList(cart.getId());
+        return cartDetailDtoList;
+    }
+
+    @Deprecated
     public List<CartDetailDto> getCartList(String email) {
         Member member = memberRepository.findByEmail(email);
         List<CartDetailDto> cartDetailDtoList = new ArrayList<>();
@@ -68,7 +84,21 @@ public class CartService {
         return cartDetailDtoList;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public boolean validateCartItemByUserId(Long cartItemId, Long userId) {
+        CartItem cartItem = cartItemRepository.findCartItemByIdWithCart(cartItemId)
+                .orElseThrow(EntityNotFoundException::new);
+
+        Long savedMemberId = cartItem.cart.getMember().getId();
+
+        if (savedMemberId != userId) {
+            return false;
+        }
+        return true;
+    }
+
+    @Deprecated
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public boolean validateCartItem(Long cartItemId, String email) {
         Member curMember = memberRepository.findByEmail(email);
         CartItem cartItem = cartItemRepository.findById(cartItemId)
@@ -79,10 +109,39 @@ public class CartService {
         if (curMember != savedMember) {
             return false;
         }
-
         return true;
     }
 
+    @Transactional
+    public Long orderCartItems(List<CartOrderDto> cartOrderDtoList, Long userId) {
+        List<OrderDto> orderDtoList = new ArrayList<>();
+
+        List<Long> cartItemIdList = cartOrderDtoList.stream()
+                .map(CartOrderDto::getCartItemId)
+                .toList();
+
+        List<CartItem> cartItemList = cartItemRepository.findAllById(cartItemIdList);
+
+        if (cartItemList.size() != cartItemIdList.size()) {
+            throw new EntityNotFoundException();
+        }
+
+        for (CartItem cartItem : cartItemList) {
+            OrderDto orderDto = new OrderDto();
+            orderDto.setItemId(cartItem.getItem().getId());
+            orderDto.setCount(cartItem.getCount());
+            orderDtoList.add(orderDto);
+        }
+
+        Long orderId = orderService.orderCartItems(orderDtoList, userId);
+
+        this.deleteByIdList(cartItemIdList);
+
+        return orderId;
+    }
+
+    @Deprecated
+    @Transactional
     public Long orderCartItem(List<CartOrderDto> cartOrderDtoList, String email) {
         List<OrderDto> orderDtoList = new ArrayList<>();
 
@@ -108,6 +167,7 @@ public class CartService {
 
     }
 
+    @Transactional
     public void updateCartItem(Long cartItemId, int count) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(EntityNotFoundException::new);
@@ -115,11 +175,15 @@ public class CartService {
         cartItem.updateCount(count);
     }
 
+    @Transactional
     public void deleteCartItem(Long cartItemId) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(EntityNotFoundException::new);
         cartItemRepository.delete(cartItem);
     }
 
-
+    @Transactional
+    public void deleteByIdList(List<Long> idList) {
+        cartItemRepository.deleteAllById(idList);
+    }
 }

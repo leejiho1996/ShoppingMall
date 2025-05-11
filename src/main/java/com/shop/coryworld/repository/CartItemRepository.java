@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     CartItem findByCartIdAndItemId(Long cartId, Long itemId);
@@ -20,4 +21,10 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
             "order by ci.regTime desc"
     )
     List<CartDetailDto> findCartDetailDtoList(Long cartId);
+
+    @Query("select ci from CartItem ci join fetch ci.cart where ci.id = :cartItemId")
+    Optional<CartItem> findCartItemByIdWithCart(Long cartItemId);
+
+    @Query("select ci from CartItem ci where ci.id in :cartIdList")
+    List<CartItem> findCartItemByIdList(List<Long> cartIdList);
 }

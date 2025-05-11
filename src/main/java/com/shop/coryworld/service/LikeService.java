@@ -5,11 +5,12 @@ import com.shop.coryworld.exception.NoAuthorizationException;
 import com.shop.coryworld.repository.ItemRepository;
 import com.shop.coryworld.repository.LikeRepository;
 import com.shop.coryworld.repository.MemberRepository;
-import com.shop.coryworld.dto.LikeItemDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +54,11 @@ public class LikeService {
 
         likeItem.getItem().removeLike();
         likeRepository.delete(likeItem);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Item> getLikeItem(Long memberId) {
+        return likeRepository.getLikeItem(memberId);
     }
 
     /**

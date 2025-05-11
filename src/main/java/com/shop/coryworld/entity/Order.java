@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -35,6 +36,7 @@ public class Order extends BaseEntity {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "order",
                 orphanRemoval = true)
+    @BatchSize(size = 50)
     private List<OrderItem> orderItems = new ArrayList<>();
 
     private LocalDateTime orderDate;
