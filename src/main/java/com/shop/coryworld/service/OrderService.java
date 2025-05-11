@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -36,13 +37,14 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
+@EnableRetry
 public class OrderService {
 
     // 할인이나 대규모 주문이 발생할 만한 이벤트시 true
     @Value("${order.event.mode}")
     private boolean orderEventMode;
 
-    private static final int STOCK_THRESHOLD = 30;
+    private static final int STOCK_THRESHOLD = 10;
 
     private final EntityManager em;
     private final ItemRepository itemRepository;
@@ -83,8 +85,8 @@ public class OrderService {
                     ObjectOptimisticLockingFailureException.class,
                     StaleObjectStateException.class
             },
-            maxAttempts = 3,
-            backoff = @Backoff(delay = 300)
+            maxAttempts = 5,
+            backoff = @Backoff(delay = 50)
     )
     public Long orderCartItems(List<OrderDto> orderDtoList, Long userId) {
         List<OrderItem> orderItems = new ArrayList<>();

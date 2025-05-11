@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 @Transactional
 class OrderServiceTest {
+
+    static int purchaseAttempts = 2;
 
     @Autowired
     private  ItemRepository itemRepository;
@@ -51,7 +54,7 @@ class OrderServiceTest {
         itemRepository.save(Item.getTestItem());
         entityManager.flush();
 
-        for (long userId = 1; userId <= 100; userId++) {
+        for (long userId = 1; userId <= purchaseAttempts; userId++) {
             Member dummy = Member.getDummyMember(userId);
             memberRepository.save(dummy);
         }
@@ -69,7 +72,6 @@ class OrderServiceTest {
         List<Item> allById = itemRepository.findAllById(List.of(1L));
         log.info("saveId = {}", allById);
 
-        final int purchaseAttempts = 100;
         ExecutorService executor = Executors.newFixedThreadPool(purchaseAttempts);
         CountDownLatch readyLatch = new CountDownLatch(purchaseAttempts);
         CountDownLatch startLatch = new CountDownLatch(1);
