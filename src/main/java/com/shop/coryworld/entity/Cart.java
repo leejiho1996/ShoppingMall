@@ -5,7 +5,11 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name="cart")
+@Table(name="cart",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "unique_cart_member", columnNames = {"member_id"})
+        }
+        )
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

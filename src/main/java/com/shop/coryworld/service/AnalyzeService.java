@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -46,7 +47,7 @@ public class AnalyzeService {
                 ));
     }
 
-
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<AnalyzeItemDto> doAnalyze(MultipartFile multipartFile) throws IOException {
         // 파일 확인
         if (multipartFile.isEmpty()) {

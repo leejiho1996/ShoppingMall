@@ -140,7 +140,7 @@
                             <a th:href="'/item/' +${item.id}" class="text-dark">
                             <p class="card-text">[[${item.itemDetail}]]</p>
                             </a>
-                            <!-- 💸 가격 + 하트 아이콘 함께 정렬 -->
+                            <!-- 가격 + 하트 아이콘 함께 정렬 -->
                             <div class="d-flex justify-content-between align-items-center mt-2">
                                 <h3 class="card-title text-danger mb-0">
                                     [[${#numbers.formatDecimal(item.price, 1, 'COMMA', 0, 'POINT')}]]원

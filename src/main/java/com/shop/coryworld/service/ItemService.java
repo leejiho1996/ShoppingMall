@@ -21,6 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -126,5 +127,18 @@ public class ItemService {
             throw new NoAuthorizationException("권한이 없습니다.");
         }
         itemRepository.deleteById(itemId);
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public Item findItem(Boolean eventMode, Long itemId) {
+        return (eventMode
+                ? itemRepository.findByIdForUpdate(itemId)
+                : itemRepository.findById(itemId))
+                .orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public List<Item> findItemPessimistic(List<Long> itemIds) {
+        return itemRepository.findItemByIdListForUpdate(itemIds);
     }
 }

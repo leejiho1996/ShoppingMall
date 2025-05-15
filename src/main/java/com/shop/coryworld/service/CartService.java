@@ -24,6 +24,7 @@ public class CartService {
 
     private final ItemRepository itemRepository;
     private final MemberRepository memberRepository;
+    private final MemberService memberService;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final OrderService orderService;
@@ -33,7 +34,7 @@ public class CartService {
         Item item = itemRepository.findById(cartItemDto.getItemId())
                 .orElseThrow(EntityNotFoundException::new);
 
-        Member member = memberRepository.findByEmail(email);
+        Member member = memberService.findMemberByEmail(email);
         Cart cart = cartRepository.findByMemberId(member.getId());
 
         if (cart == null) {

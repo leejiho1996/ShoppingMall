@@ -48,6 +48,7 @@ public class OrderService {
 
     private final EntityManager em;
     private final ItemRepository itemRepository;
+    private final ItemService itemService;
     private final MemberRepository memberRepository;
     private final OrderRepository orderRepository;
     private final ItemImgRepository itemImgRepository;
@@ -63,7 +64,7 @@ public class OrderService {
             backoff = @Backoff(delay = 300)
     )
     public Long order(OrderDto orderDto, String email) {
-        Item item = findItem(orderDto.getItemId());
+        Item item = itemService.findItem(orderEventMode, orderDto.getItemId());
 
         Member member = memberRepository.findByEmail(email);
         List<OrderItem> orderItems = new ArrayList<>();
@@ -118,7 +119,7 @@ public class OrderService {
         // 재고가 적은 아이템을 비관적 락으로 다시 search
         List<Item> pessimisticOrderItem = pessimisticOrderItemIds.isEmpty()
                 ? List.of()
-                : findItemPessimistic(pessimisticOrderItemIds);
+                : itemService.findItemPessimistic(pessimisticOrderItemIds);
 
         // Map에 모든 아이템을 모은다
         Map<Long, Item> finalItemMap = items.stream()
@@ -206,18 +207,7 @@ public class OrderService {
         order.cancelOrder();
     }
 
-    @Transactional
-    public Item findItem(Long itemId) {
-        return (orderEventMode
-                ? itemRepository.findByIdForUpdate(itemId)
-                : itemRepository.findById(itemId))
-                .orElseThrow(EntityNotFoundException::new);
-    }
 
-    @Transactional
-    public List<Item> findItemPessimistic(List<Long> itemIds) {
-        return itemRepository.findItemByIdListForUpdate(itemIds);
-    }
 
     // @Transactional
 //    public Long orderCartItems(List<OrderDto> orderDtoList, Long userId) {
