@@ -61,7 +61,6 @@ public class ItemService {
         return item.getId();
     }
 
-    @Transactional(readOnly = true)
     public ItemFormDto getItemDtl(Long itemId) {
 
         Item item = itemRepository.findById(itemId).orElseThrow(EntityNotFoundException::new);
@@ -105,12 +104,10 @@ public class ItemService {
         return item.getId();
     }
 
-    @Transactional(readOnly = true)
     public Page<Item> getAdminItemPage(ItemSearchDto itemsearchDto, Pageable pageable) {
         return itemRepository.getAdminItemPage(itemsearchDto, pageable);
     }
 
-    @Transactional(readOnly = true)
     public Page<MainItemDto> getMainItemPage(ItemSearchDto itemSearchDto, Pageable pageable, PrincipalDetails user) {
         Long memberId = -1L;
 
